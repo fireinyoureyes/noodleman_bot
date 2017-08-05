@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 const  token = '363674681:AAE7f2DnppdFL9QZo5lzGmbFykWNs5-ygy4';
-var botOptions = {
+let botOptions = {
     polling: true
 };
 const bot = new TelegramBot(token, botOptions);
@@ -17,16 +17,6 @@ bot.getMe().then(function(me)
     console.log('And my username is @%s.', me.username);
 })
 
-/*var order = {
-  duckRamen:0,
-  tomYoung:0,
-  porkNoodles:0,
-  chickenNoodles:0,
-  lichee:0,
-  mango:0,
-  bud:0,
-  proseco:0
-};*/
 class Food {
 
   constructor(name, amount) {
@@ -48,7 +38,7 @@ class Food {
 
 };
 
-var foodItems = {
+let foodItems = {
   duckRamen: new Food("Duck Ramen", 0),
   tomYoung: new Food("Tom Young", 0),
   porkNoodles: new Food("Pork Noodles", 0),
@@ -59,87 +49,87 @@ var foodItems = {
   proseco: new Food("Proseco", 0)
 };
 
-var order = [];
+let order = [];
 
-var menu = [
+const menu = [
   {
   title: "Start",
   buttons:[
-    [{text:"Menu", callback_data:"0_1"}],
-    [{text:"My Order", callback_data:"0_2"}],
-    [{text:"Send", callback_data:"0_3"}],
-    [{text:"Reset", callback_data:"0_4"}]
+    [{text:"Menu", callback_data:"START_MENU"}],
+    [{text:"My Order", callback_data:"START_ORDER"}],
+    [{text:"Send", callback_data:"START_CONFIRM"}],
+    [{text:"Reset", callback_data:"START_RESET"}]
   ]},
   {
     title: "Menu",
     buttons:[
-      [{text:"Ramen", callback_data:"1_1"}],
-      [{text:"Nodoles", callback_data:"1_2"}],
-      [{text:"Drinks", callback_data:"1_3"}],
-      [{text:"Alcohol", callback_data:"1_4"}],
-      [{text:"Back", callback_data:"1_5"}]
+      [{text:"Ramen", callback_data:"MENU_RAMEN"}],
+      [{text:"Nodoles", callback_data:"MENU_NOODLES"}],
+      [{text:"Drinks", callback_data:"MENU_DRINKS"}],
+      [{text:"Alcohol", callback_data:"MENU_ALCO"}],
+      [{text:"Back", callback_data:"MENU_BACK"}]
     ]},
   {
     title: "Ramen",
     buttons:[
-      [{text:"Duck Ramen", callback_data:"2_1"}],
-      [{text:"Tom Young", callback_data:"2_2"}],
-      [{text:"Back", callback_data:"2_3"}]
+      [{text:"Duck Ramen", callback_data:"RAMEN_DUCK"}],
+      [{text:"Tom Young", callback_data:"RAMEN_TOM"}],
+      [{text:"Back", callback_data:"RAMEN_BACK"}]
   ]},
   {
     title: "Noodles",
     buttons:[
-      [{text:"Pork Noodles", callback_data:"3_1"}],
-      [{text:"Chicken Noodles", callback_data:"3_2"}],
-      [{text:"Back", callback_data:"3_3"}]
+      [{text:"Pork Noodles", callback_data:"NOODLES_PORK"}],
+      [{text:"Chicken Noodles", callback_data:"NOODLES_CHICKEN"}],
+      [{text:"Back", callback_data:"NOODLES_BACK"}]
   ]},
   {
     title: "Drinks",
     buttons:[
-      [{text:"Lichee", callback_data:"4_1"}],
-      [{text:"Mango", callback_data:"4_2"}],
-      [{text:"Back", callback_data:"4_3"}]
+      [{text:"Lichee", callback_data:"DRINKS_LICHEE"}],
+      [{text:"Mango", callback_data:"DRINKS_MANGO"}],
+      [{text:"Back", callback_data:"DRINKS_BACK"}]
   ]},
   {
     title: "Alcohol",
     buttons:[
-      [{text:"Budweiser", callback_data:"5_1"}],
-      [{text:"Proseco", callback_data:"5_2"}],
-      [{text:"Back", callback_data:"5_3"}]
+      [{text:"Budweiser", callback_data:"ALCO_BUD"}],
+      [{text:"Proseco", callback_data:"ALCO_PROSECO"}],
+      [{text:"Back", callback_data:"ALCO_BACK"}]
   ]},
 ]
 
 bot.on('text', function(msg) {
-    var messageChatId = msg.chat.id;
-    var messageText = msg.text;
-    var messageDate = msg.date;
-    var messageUsr = msg.from.username;
+    let messageChatId = msg.chat.id;
+    let messageText = msg.text;
+    let messageDate = msg.date;
+    let messageUsr = msg.from.username;
     console.log(msg);
 
     if (messageText === '/menu') {
-      var page = menu[2];
-      var text = page.title;
-      var options = {
+      let page = menu[2];
+      let text = page.title;
+      let options = {
         reply_markup: JSON.stringify({
           inline_keyboard: page.buttons,
           parse_mode: 'Markdown'
         })
       }
 
-      chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
+      let chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
       bot.sendMessage(chat, text, options);
     }
 
     if (messageText === '/start') {
-      var page = menu[0];
-      var text = page.title;
-      var options = {
+      let page = menu[0];
+      let text = page.title;
+      let options = {
         reply_markup: JSON.stringify({
           inline_keyboard: page.buttons,
           parse_mode: 'Markdown'
         })
       }
-      chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
+      let chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
       bot.sendMessage(chat, text, options);
     }
 
@@ -150,14 +140,15 @@ bot.on('text', function(msg) {
 
 bot.on('callback_query', function (msg) {
         console.log("This is msg data you get:",msg);
-        var pick = msg.data.split('_');
-        var menu_n = pick[0];
-        var button = pick[1];
+        let pick = msg.data.split('_');
+        console.log("This is PICK data you get:",pick);
+        let source_page = pick[0];
+        let next_page = pick[1];
 
-        switch (menu_n) {
-          case '0':
-            switch (button) {
-              case '1':
+        switch (source_page) {
+          case 'START':
+            switch (next_page) {
+              case 'MENU':
                 var page = menu[1];
                 var text = page.title;
                 var options = {
@@ -166,43 +157,38 @@ bot.on('callback_query', function (msg) {
                   parse_mode: 'Markdown'
                 })
               }
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text, options);
-              bot.answerCallbackQuery(msg.id);
+              sendMsgBack(bot,msg,text,options);
                 break;
-              case '2':
-              var text = "Here you can see you order: \n"
+
+              case 'ORDER':
+              var text = "Here you can see you order: \n";
               var check = checkPls(foodItems);
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text + check );
-              bot.answerCallbackQuery(msg.id);
+              text += check;
+              sendMsgBack(bot,msg,text,options);
                 break;
-              case '3':
+
+              case 'CONFIRM':
               var text = 'Order sent. We will contact you in 5 seconds!';
               var sentOrder = checkPls(foodItems);
               var adminId = 31893285;
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
+              sendMsgBack(bot,msg,text,options);
               bot.sendMessage(adminId,sentOrder);
-              bot.sendMessage(chat, sentOrder);
-              bot.answerCallbackQuery(msg.id);
                 break;
-              case '4':
+
+              case 'RESET':
               var text = 'Your order was cleared.';
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text);
-              bot.answerCallbackQuery(msg.id);
+              sendMsgBack(bot,msg,text);
                 break;
+
               default:
               var text = 'The default property worked!';
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text);
-              bot.answerCallbackQuery(msg.id);
+              sendMsgBack(bot,msg,text,options);
                 break;
             }
             break;
-          case '1':
-            switch (button) {
-              case'1':
+          case 'MENU':
+            switch (next_page) {
+              case'RAMEN':
               var page = menu[2];
               var text = page.title;
               var options = {
@@ -211,12 +197,10 @@ bot.on('callback_query', function (msg) {
                   parse_mode: 'Markdown'
                 })
               }
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text, options);
-              bot.answerCallbackQuery(msg.id);
-
+              sendMsgBack(bot,msg,text,options);
             break;
-            case'2':
+
+            case'NOODLES':
               var page = menu[3];
               var text = page.title;
               var options = {
@@ -225,11 +209,10 @@ bot.on('callback_query', function (msg) {
                   parse_mode: 'Markdown'
           })
         }
-              chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-              bot.sendMessage(chat, text, options);
-              bot.answerCallbackQuery(msg.id);
+              sendMsgBack(bot,msg,text,options);
             break;
-            case '3':
+
+            case 'DRINKS':
               var page = menu[4];
               var text = page.title;
               var options = {
@@ -238,11 +221,10 @@ bot.on('callback_query', function (msg) {
                   parse_mode: 'Markdown'
           })
         }
-            chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-            bot.sendMessage(chat, text, options);
-            bot.answerCallbackQuery(msg.id);
+            sendMsgBack(bot,msg,text,options);
             break;
-            case '4':
+
+            case 'ALCO':
               var page = menu[5];
               var text = page.title;
               var options = {
@@ -251,11 +233,10 @@ bot.on('callback_query', function (msg) {
                   parse_mode: 'Markdown'
           })
         }
-            chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-            bot.sendMessage(chat, text, options);
-            bot.answerCallbackQuery(msg.id);
+            sendMsgBack(bot,msg,text,options);
             break;
-            case '5':
+
+            case 'BACK':
             var page = menu[0];
             var text = page.title;
             var options = {
@@ -264,41 +245,34 @@ bot.on('callback_query', function (msg) {
                 parse_mode: 'Markdown'
           })
         }
-            chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-            bot.sendMessage(chat, text, options)
+            sendMsgBack(bot,msg,text,options);
             break;
+
             default:
             var text = "The default property worked!"
-            chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-            bot.sendMessage(chat, text, options);
-            bot.answerCallbackQuery(msg.id);
+            sendMsgBack(bot,msg,text,options);
             break;
         }
         break;
-        case '2':
-        switch (button) {
-          case '1':
+        case 'RAMEN':
+        switch (next_page) {
+          case 'DUCK':
           //duck ramen added
           foodItems.duckRamen.addItem();
-          console.log(foodItems.duckRamen);
           orderItem('duckRamen',con);
-
           var text = "You ordered Duck Ramen!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
             break;
-          case '2':
+
+          case 'TOM':
           //tom young added
           foodItems.tomYoung.addItem();
-          console.log(foodItems.tomYoung);
           orderItem('tomYoung',con);
           var text = "You ordered Tom Young!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
           break;
-          case '3':
+
+          case 'BACK':
           var page = menu[1];
           var text = page.title;
           var options = {
@@ -307,38 +281,32 @@ bot.on('callback_query', function (msg) {
             parse_mode: 'Markdown'
           })
         }
-        chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-        bot.sendMessage(chat, text, options);
-        bot.answerCallbackQuery(msg.id);
+        sendMsgBack(bot,msg,text,options);
           break;
+
           default:
           break;
         }
         break;
-        case '3':
-        switch (button) {
-          case '1':
+        case 'NOODLES':
+        switch (next_page) {
+          case 'PORK':
           //pork noodles added
           foodItems.porkNoodles.addItem();
-          console.log(foodItems.porkNoodles);
           orderItem('porkNoodles',con);
-
           var text = "You ordered Pork Noodles!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
             break;
-          case '2':
+
+          case 'CHICKEN':
           //chicken noodles added
           foodItems.chickenNoodles.addItem();
-          console.log(foodItems.chickenNoodles);
           orderItem('chickenNoodles',con);
           var text = "You ordered Chicken Noodles!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
           break;
-          case '3':
+
+          case 'BACK':
           var page = menu[1];
           var text = page.title;
           var options = {
@@ -347,38 +315,33 @@ bot.on('callback_query', function (msg) {
             parse_mode: 'Markdown'
           })
         }
-        chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-        bot.sendMessage(chat, text, options);
-        bot.answerCallbackQuery(msg.id);
+        sendMsgBack(bot,msg,text,options);
           break;
+
           default:
           break;
         }
         break;
-        case '4':
-        switch (button) {
-          case '1':
+
+        case 'DRINKS':
+        switch (next_page) {
+          case 'LICHEE':
           //lichee drink added
           foodItems.lichee.addItem();
-          console.log(foodItems.lichee);
           orderItem('lichee',con);
           var text = "You ordered Lichee Drink!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
             break;
-          case '2':
+
+          case 'MANGO':
           //mango drink added
           foodItems.mango.addItem();
-          console.log(foodItems.mango);
           orderItem('mango',con);
           var text = "You ordered Mango Drink!"
-
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
           break;
-          case '3':
+
+          case 'BACK':
           var page = menu[1];
           var text = page.title;
           var options = {
@@ -387,39 +350,32 @@ bot.on('callback_query', function (msg) {
             parse_mode: 'Markdown'
           })
         }
-        chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-        bot.sendMessage(chat, text, options);
-        bot.answerCallbackQuery(msg.id);
+        sendMsgBack(bot,msg,text,options);
           break;
+
           default:
           break;
         }
         break;
-        case '5':
-        switch (button) {
-          case '1':
+        case 'ALCO':
+        switch (next_page) {
+          case 'BUD':
           //budweiser added
           foodItems.bud.addItem();
-          console.log(foodItems.bud);
           orderItem('bud',con);
-
           var text = "You ordered Budweiser!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
             break;
-          case '2':
+
+          case 'PROSECO':
           //proseco added
           foodItems.proseco.addItem();
-          console.log(foodItems.proseco);
           orderItem('proseco',con);
-
           var text = "You ordered Proseco!"
-          chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-          bot.sendMessage(chat, text);
-          bot.answerCallbackQuery(msg.id);
+          sendMsgBack(bot,msg,text,options);
           break;
-          case '3':
+
+          case 'BACK':
           var page = menu[1];
           var text = page.title;
           var options = {
@@ -428,10 +384,9 @@ bot.on('callback_query', function (msg) {
             parse_mode: 'Markdown'
           })
         }
-        chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
-        bot.sendMessage(chat, text, options);
-        bot.answerCallbackQuery(msg.id);
+        sendMsgBack(bot,msg,text,options);
           break;
+
           default:
           break;
         }
@@ -439,8 +394,8 @@ bot.on('callback_query', function (msg) {
       }
 });
 
-var mysql = require('mysql');
-var con = mysql.createConnection({
+const mysql = require('mysql');
+const con = mysql.createConnection({
   host: 'localhost',
   user: 'username',
   password: 'password',
@@ -449,13 +404,13 @@ var con = mysql.createConnection({
 
 /*function orderItem(id, connection) {
   connection.connect(function (err) {
-    var foodItem = connection.query("SELECT * FROM customers WHERE foodId = " + id, function (err, result) {
+    let foodItem = connection.query("SELECT * FROM customers WHERE foodId = " + id, function (err, result) {
       if(err) console.log(err);
       console.log(result);
     });
       console.log(foodItem);
     if(foodItem[0].foodAmount > 0) {
-      var newAmount = foodItem[0].foodAmount--;
+      let newAmount = foodItem[0].foodAmount--;
       connection.query("UPDATE customers SET foodAmount = " + newAmount + "WHERE foodN ="+ id, function(err,result) {
         if (err) console.log(err);
       });
@@ -473,9 +428,9 @@ var con = mysql.createConnection({
 //
 function checkPls (foodItems) {
   console.log(foodItems);
-  var check = [];
-  var checkMsg = "";
-  for(var key in foodItems) {
+  let check = [];
+  let checkMsg = "";
+  for(let key in foodItems) {
     console.log(foodItems[key]);
     if( foodItems[key].amount > 0) {
       check.push(foodItems[key]);
@@ -488,13 +443,13 @@ function checkPls (foodItems) {
   }
 
 function orderItem(id,connection) {
-  var itemData;
+  let itemData;
   connection.connect(function (err) {
   connection.query("SELECT * FROM customers WHERE foodId = ?",[id], function (err, result) {
       if(err) console.log(err);
       itemData = result[0];
       console.log(itemData);
-      var newAmount = itemData.foodAmount;
+      let newAmount = itemData.foodAmount;
       newAmount--;
       console.log(newAmount, itemData.foodAmount);
       connection.query("UPDATE customers SET foodAmount = ? WHERE foodId = ?",[newAmount, id],function (err, result) {
@@ -506,4 +461,11 @@ function orderItem(id,connection) {
         });
     });
   });
+}
+
+
+function sendMsgBack(bot,msg,text, options) {
+  let chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
+  bot.sendMessage(chat, text, options);
+  bot.answerCallbackQuery(msg.id);
 }
